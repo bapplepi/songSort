@@ -3,9 +3,11 @@
 //
 
 #include "songDatabase.h"
+#include <iostream>
 #include <experimental/optional>
 using experimental::optional;
 using experimental::nullopt;
+using namespace std;
 
 int main() {
     songDatabase songs;
@@ -47,4 +49,17 @@ int main() {
     songs.listSongsByArtist("Beethoven");
     songs.listSongsByArtist("Bach");
     songs.listSongsByArtist("Brahms");
+
+    //12. write to file
+    songs.dumpSongList();
+
+    //13. create new database
+    songDatabase songs2;
+    songs2.openSongList();
+
+    //14. compare output from the two
+    songs.printSongs(true);
+    cout << "***" << endl;
+    songs2.printSongs(true);
+
 }

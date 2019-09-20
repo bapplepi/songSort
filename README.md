@@ -49,3 +49,20 @@ Thirdly:
 
     (I put this here to back me up re: the fact that I did write tests, even)
     though the output has to be checked by hand.
+
+Fourthly:
+    I didn't have test cases at all for reading/writing to files, because that
+    was something I thought of during implementation.
+
+    Output should be:
+
+    Tracklist:
+
+    >Ode to Joy
+            Beethoven
+    >That's Classic
+        Group name: The Bs
+            Bach
+            Beethoven
+
+    for both databases. This did not work on the first try either.

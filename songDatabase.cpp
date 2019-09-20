@@ -1,5 +1,5 @@
 //
-// Created by Prime on 9/19/2019.
+// Created by Prime on 9/12/2019.
 //
 
 #include "songDatabase.h"
@@ -61,6 +61,8 @@ int songDatabase::openSongList() {
 
         songList.insert(pair<string, songEntry>(segmentList[0], newSong));
     }
+
+    songFile.close();
 
     return 0;
 }
@@ -181,7 +183,9 @@ int songDatabase::songEntry::printArtists() {
 }
 
 string songDatabase::songEntry::writeArtists() {
-    string rtn = artist[0];
+    string rtn = "";
+    if(artist.size() > 0)
+        rtn = (artist[0] + ":");
     for(int i = 1; i < artist.size(); i++)
         rtn += (artist[i] + ":");
     if(group)
