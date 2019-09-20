@@ -3,8 +3,34 @@
 //
 
 #include <iostream>
+#include <memory>
 #include "songDatabase.h"
 using namespace std;
+
+void mainLoop(unique_ptr<songDatabase> songs, int vb) {
+    string input;
+    int in;
+
+    while(true) {
+        cout << "(113) to quit, (1) to add a song, (2) to view songs, (3) to view songs by artist." << endl;
+        getline(cin, input);
+        in = stoi(input);
+        if(in == 113) {
+            songs->dumpSongList();
+            exit(0);
+        }
+        else if(in == 1)
+            songs->addSong(vb);
+        else if(in == 2)
+            songs->printSongs(vb);
+        else if(in == 3) {
+            cout << "Artist name?" << endl;
+            string name;
+            getline(cin, name);
+            songs->listSongsByArtist(name);
+        }
+    }
+}
 
 int main() {
 
@@ -20,23 +46,7 @@ int main() {
     getline(cin, input);
     vb = stoi(input);
 
-    while(true) {
-        cout << "(113) to quit, (1) to add a song, (2) to view songs, (3) to view songs by artist." << endl;
-        getline(cin, input);
-        in = stoi(input);
-        if(in == 113) {
-            songs.dumpSongList();
-            return 0;
-        }
-        else if(in == 1)
-            songs.addSong(vb);
-        else if(in == 2)
-            songs.printSongs(vb);
-        else if(in == 3) {
-            cout << "Artist name?" << endl;
-            string name;
-            getline(cin, name);
-            songs.listSongsByArtist(name);
-        }
-    }
+    mainLoop(make_unique<songDatabase>(songs), vb);
+
+    return 0;
 }
