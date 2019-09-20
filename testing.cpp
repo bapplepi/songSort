@@ -20,15 +20,15 @@ int main() {
     //3. search for an artist that doesn't exist
     songs.listSongsByArtist("test");
 
-    //4. add a proper song
+    //4. print what should still be an empty list
+    songs.printSongs(true);
+
+    //5. add a proper song
     artists.push_back("Beethoven");
     songs.addSong("Ode to Joy", artists, nullopt);
 
-    //5. print
+    //6. print
     songs.printSongs(true);
-
-    //6. search by artist
-    songs.listSongsByArtist("Beethoven");
 
     //7. search for an empty artist
     songs.listSongsByArtist("");

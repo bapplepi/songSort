@@ -1,5 +1,5 @@
 //
-// Created by Prime on 9/12/2019.
+// Created by Prime on 9/19/2019.
 //
 
 #ifndef SONGSDATABASE_SONGDATABASE_H
@@ -15,6 +15,9 @@ using experimental::optional;
 
 class songDatabase {
 public:
+    //read and write file
+    int openSongList();
+    int dumpSongList();
 
     int addSong(int vb);
     int addSong(string songName, vector<string> &artistNames, optional<string> groupName);
