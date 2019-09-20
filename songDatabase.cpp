@@ -44,10 +44,7 @@ int songDatabase::openSongList() {
         std::vector<std::string> segmentList;
 
         while(std::getline(test, segment, ':'))
-        {
             segmentList.push_back(segment);
-            cout << segment << endl;
-        }
 
         songEntry newSong = songEntry();
         for(int i = 1; i < segmentList.size(); i++) {
@@ -66,7 +63,6 @@ int songDatabase::openSongList() {
 
     return 0;
 }
-
 
 int songDatabase::addSong(string songName, vector<string> &artistNames, optional<string> groupName) {
     songEntry newSong;
@@ -121,7 +117,74 @@ int songDatabase::addSong(int vb) {
     return 0;
 }
 
+int songDatabase::getPreferredSong(pair<string, songEntry> &songOne, pair<string, songEntry> &songTwo) {
+    cout << "Which song do you prefer?" << endl << "1." << endl;
+    printSong(songOne, true);
+    cout << endl << "2." << endl;
+    printSong(songTwo, true);
+
+    string input;
+    getline(cin, input);
+    int in = stoi(input);
+
+    return in;
+}
+
+int songDatabase::binarySearch(vector<pair<string, songEntry>> &songVector, pair<string, songEntry> songToPlace, int bestSong, int worstSong) {
+
+    //this leads to the occasional repeat question...
+    if(worstSong <= bestSong) {
+        while (true) {
+            int i = getPreferredSong(songToPlace, songVector[bestSong]);
+            if (i == 1)
+                return bestSong;
+            else if (i == 2)
+                return bestSong + 1;
+            else
+                cout << "Invalid input, please try again" << endl;
+        }
+    }
+
+    int mid = (bestSong + worstSong)/2;
+
+    int in = getPreferredSong(songVector[mid], songToPlace);
+
+    while(true) {
+        if (in == 2)
+            return binarySearch(songVector, songToPlace, bestSong, mid - 1);
+        else if (in == 1)
+            return binarySearch(songVector, songToPlace, mid + 1, worstSong);
+        else
+            cout << "Invalid input, please try again" << endl;
+    }
+
+}
+
 int songDatabase::sortGame() {
+    vector<pair<string, songEntry>> songVector;
+
+    //move our songs to a vector so we can play our sorting game
+    for(auto it = songList.begin(); it != songList.end(); it++)
+        songVector.push_back(*it);
+
+    for(int i = 1; i < songVector.size(); i++) {
+        int worstSong = i - 1;
+        auto currentSong = songVector[i];
+        int currentSongDestination = binarySearch(songVector, currentSong, 0, worstSong);
+
+        if(currentSongDestination != i) {
+            songVector.erase(songVector.begin() + i);
+            songVector.insert(songVector.begin() + currentSongDestination, currentSong);
+        }
+    }
+
+    cout << "Your sorted list:" << endl;
+
+    for(int i = 0; i < songVector.size(); i++)
+        cout << i + 1 << ". " << songVector[i].first << endl;
+
+    cout << endl;
+
     return 0;
 }
 
@@ -138,13 +201,17 @@ int songDatabase::listSongsByArtist(string artistName) {
     return 0;
 }
 
+int songDatabase::printSong(pair<string, songEntry> song, bool verbose) {
+    cout << ">" << song.first << endl;
+    if(verbose)
+        song.second.printArtists();
+}
+
 int songDatabase::printSongs(bool verbose) {
     cout << "Tracklist:" << endl << endl;
-    for(auto it = songList.begin(); it != songList.end(); it++) {
-        cout << ">" << it->first << endl;
-        if(verbose)
-            it->second.printArtists();
-    }
+
+    for(auto it = songList.begin(); it != songList.end(); it++)
+        printSong(*it, verbose);
 
     cout << endl;
     return 0;

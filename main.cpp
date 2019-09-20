@@ -12,7 +12,7 @@ void mainLoop(unique_ptr<songDatabase> songs, int vb) {
     int in;
 
     while(true) {
-        cout << "(113) to quit, (1) to add a song, (2) to view songs, (3) to view songs by artist." << endl;
+        cout << "(113) to quit, (1) to add a song, (2) to view songs, (3) to view songs by artist, (4) to play the sorting game." << endl;
         getline(cin, input);
         in = stoi(input);
         if(in == 113) {
@@ -29,6 +29,11 @@ void mainLoop(unique_ptr<songDatabase> songs, int vb) {
             getline(cin, name);
             songs->listSongsByArtist(name);
         }
+        else if(in == 4) {
+            cout << "Let's sort songs!" << endl << endl;
+            songs->sortGame();
+        }
+
     }
 }
 

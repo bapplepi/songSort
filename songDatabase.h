@@ -49,9 +49,14 @@ private:
         vector<string> artist;
         optional<string> group;
     };
-
     map<string, songEntry> songList;
 
+    int printSong(pair<string, songEntry> song, bool verbose);
+
+    int getPreferredSong(pair<string, songEntry> &songOne, pair<string, songEntry> &songTwo);
+
+    int binarySearch(vector<pair<string, songEntry>> &songVector, pair<string, songEntry> songToPlace, int bestSong,
+                     int worstSong);
 };
 
 #endif //SONGSDATABASE_SONGDATABASE_H
