@@ -67,3 +67,6 @@ Fourthly:
 
     for both databases. This did not work on the first try either.
 
+    The test input for sortGame should be:
+    That's Classic > 5 > This Isn't a Real Song > Ode to Joy. Output should
+    return the list in that order.

@@ -62,4 +62,10 @@ int main() {
     cout << "***" << endl;
     songs2.printSongs(true);
 
+    //15. add more songs and test sort
+    songs.addSong("This Isn't a Real Song", artists, nullopt);
+    songs.addSong("5", artists, nullopt);
+    songs.sortGame();
+
+
 }

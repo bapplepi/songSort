@@ -65,12 +65,17 @@ int songDatabase::openSongList() {
 }
 
 int songDatabase::addSong(string songName, vector<string> &artistNames, optional<string> groupName) {
+    if(songName.empty()) {
+        cout << "Invalid input." << endl;
+        return 0;
+    }
     songEntry newSong;
     for(int i = 0; i < artistNames.size(); i++)
         newSong.addArtist(artistNames[i]);
     if(groupName)
         newSong.addGroupName(*groupName);
     songList.insert(pair<string, songEntry>(songName, newSong));
+    return 0;
 }
 
 int songDatabase::addSong(int vb) {
@@ -205,6 +210,7 @@ int songDatabase::printSong(pair<string, songEntry> song, bool verbose) {
     cout << ">" << song.first << endl;
     if(verbose)
         song.second.printArtists();
+    return 0;
 }
 
 int songDatabase::printSongs(bool verbose) {
