@@ -3,6 +3,7 @@
 //
 
 #include "songDatabase.h"
+#include <random>
 #include <string>
 #include <map>
 #include <iostream>
@@ -12,6 +13,7 @@
 #include <algorithm>
 using namespace std;
 using experimental::optional;
+using experimental::make_optional;
 using experimental::nullopt;
 
 
@@ -20,11 +22,11 @@ using experimental::nullopt;
 int songDatabase::dumpSongList() {
     ofstream songFile;
     songFile.open ("songList.txt");
-    for(auto it = songList.begin(); it != songList.end(); it++) {
+    for(auto & it : songList) {
         //write song name
-        songFile << it->first << ":";
+        songFile << it.first << ":";
         //write artist names + extras if they exist
-        songFile << it->second.writeArtists();
+        songFile << it.second.writeArtists();
         songFile << endl;
     }
     songFile.close();
@@ -64,16 +66,18 @@ int songDatabase::openSongList() {
     return 0;
 }
 
-int songDatabase::addSong(string songName, vector<string> &artistNames, optional<string> groupName) {
+int songDatabase::addSong(const string& songName, vector<string> &artistNames, optional<vector<string>> groupName) {
     if(songName.empty()) {
         cout << "Invalid input." << endl;
         return 0;
     }
     songEntry newSong;
-    for(int i = 0; i < artistNames.size(); i++)
-        newSong.addArtist(artistNames[i]);
-    if(groupName)
-        newSong.addGroupName(*groupName);
+    for(const auto & artistName : artistNames)
+        newSong.addArtist(artistName);
+    if(groupName) {
+        for(const auto & i : groupName.value())
+            newSong.addGroupName(i);
+    }
     songList.insert(pair<string, songEntry>(songName, newSong));
     return 0;
 }
@@ -102,20 +106,34 @@ int songDatabase::addSong(int vb) {
 
     cout << "Optional tags: (0) none, (1) group name" << endl;
 
-    //get group name if applicable and add to entry
+    //get group names if applicable and add to entry
     string input;
     getline(cin, input);
     int i = stoi(input);
 
-    optional<string> groupName;
+    optional<vector<string>> groups = nullopt;
 
     if(i == 1) {
-        cout << "Group name?" << endl;
-        getline(cin, *groupName);
+
+        groups = {};
+
+        //get artist count
+        cout << "How many groups?" << endl;
+        getline(cin, count);
+        int groupCount = stoi(count);
+
+        //artist name list
+
+        for(int j = 0; j < groupCount; j++) {
+            cout << "Group name?" << endl;
+            string name;
+            getline(cin, name);
+            groups.value().push_back(name);
+        }
     }
 
     //add entry to list
-    addSong(songName, artists, groupName);
+    addSong(songName, artists, groups);
 
     printSongs(vb);
 
@@ -169,8 +187,10 @@ int songDatabase::sortGame() {
     vector<pair<string, songEntry>> songVector;
 
     //move our songs to a vector so we can play our sorting game
-    for(auto it = songList.begin(); it != songList.end(); it++)
-        songVector.push_back(*it);
+    for(auto & it : songList)
+        songVector.emplace_back(it);
+
+    shuffle(songVector.begin(), songVector.end(), std::mt19937(std::random_device()()));
 
     for(int i = 1; i < songVector.size(); i++) {
         int worstSong = i - 1;
@@ -196,9 +216,9 @@ int songDatabase::sortGame() {
 int songDatabase::listSongsByArtist(string artistName) {
     cout << "Songs by " << artistName << ":\n";
 
-    for(map<string, songEntry>::iterator it = songList.begin(); it != songList.end(); it++) {
-        if(it->second.hasArtist(artistName))
-            cout << ">" << it->first << endl;
+    for(auto & it : songList) {
+        if(it.second.hasArtist(artistName))
+            cout << ">" << it.first << endl;
     }
 
     cout << endl;
@@ -216,8 +236,8 @@ int songDatabase::printSong(pair<string, songEntry> song, bool verbose) {
 int songDatabase::printSongs(bool verbose) {
     cout << "Tracklist:" << endl << endl;
 
-    for(auto it = songList.begin(); it != songList.end(); it++)
-        printSong(*it, verbose);
+    for(auto & it : songList)
+        printSong(it, verbose);
 
     cout << endl;
     return 0;
@@ -225,11 +245,11 @@ int songDatabase::printSongs(bool verbose) {
 
 bool songDatabase::songEntry::hasArtist(string name) {
     if(group)
-        if((*group).compare(name) == 0)
-            return true;
-    if (find(artist.begin(), artist.end(), name) != artist.end())
-        return true;
-    return false;
+        for(int i = 0; i < group.value().size(); i++) {
+            if(group.value()[i].compare(name) == 0)
+                return true;
+        }
+    return find(artist.begin(), artist.end(), name) != artist.end();
 }
 
 int songDatabase::songEntry::addArtist(string name) {
@@ -238,31 +258,44 @@ int songDatabase::songEntry::addArtist(string name) {
 }
 
 int songDatabase::songEntry::addGroupName(string name) {
-    group = name;
+    if(group == nullopt)
+        group = make_optional<vector<string>>({});
+    group.value().push_back(name);
     return 0;
 }
 
-songDatabase::songEntry::songEntry() : artist() {
+songDatabase::songEntry::songEntry() : artist(), group() {
     group = nullopt;
 }
 
 int songDatabase::songEntry::printArtists() {
-    if(group)
-        cout << "    Group name: " << *group << endl;
-    for(int i = 0; i < artist.size(); i++)
-        cout << "\t" << artist[i] << endl;
+    if(group != nullopt) {
+        if(group.value().size() > 1)
+            cout << "    Group names: " << endl;
+        else
+            cout << "    Group name: " << endl;
+        for (const auto & i : group.value())
+            cout << "\t" << i << endl;
+    }
+
+    if(artist.size() > 1)
+        cout << "    Artists:" << endl;
+    else
+        cout << "    Artist:" << endl;
+
+    for(const auto & i : artist)
+        cout << "\t" << i << endl;
 
     return 0;
 }
 
 string songDatabase::songEntry::writeArtists() {
     string rtn = "";
-    if(artist.size() > 0)
-        rtn = (artist[0] + ":");
-    for(int i = 1; i < artist.size(); i++)
+    for(int i = 0; i < artist.size(); i++)
         rtn += (artist[i] + ":");
-    if(group)
-        rtn += ("-g-" + *group + ":");
+    if(group != nullopt)
+        for (const auto & i : group.value())
+            rtn += ("-g-" + i + ":");
 
     return rtn;
 }

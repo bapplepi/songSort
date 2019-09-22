@@ -20,7 +20,7 @@ public:
     int dumpSongList();
 
     int addSong(int vb);
-    int addSong(string songName, vector<string> &artistNames, optional<string> groupName);
+    int addSong(const string &songName, vector<string> &artistNames, optional<vector<string>> groupName);
 
     //print info
     int listSongsByArtist(string artistName);
@@ -47,7 +47,7 @@ private:
 
     private:
         vector<string> artist;
-        optional<string> group;
+        optional<vector<string>> group;
     };
     map<string, songEntry> songList;
 
